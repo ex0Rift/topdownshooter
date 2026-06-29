@@ -1,7 +1,7 @@
 const gameScreen = document.getElementById('game');
 const ctx = gameScreen.getContext('2d');
 
-const player = {x: 100, y: 100, size: 250};
+let player = {x: 100, y: 100, size: 50, speed: 10};
 
 //keypress 
 const keys = {};
@@ -15,7 +15,10 @@ function resizeScreen(){
 }
 
 function update(){
-    if (keys['ArrowUp']) console.log('true');
+    if (keys['w']) player.y -= player.speed;
+    if (keys['a']) player.x -= player.speed;
+    if (keys['s']) player.y += player.speed;
+    if (keys['d']) player.x += player.speed;
 }
 
 function render(){
@@ -24,6 +27,11 @@ function render(){
 
     //draw screen items
     ctx.fillRect(player.x, player.y, player.size,player.size);
+
+    //draw UI
+
+    //player health bar
+    ctx.fillRect(30,gameScreen.height-80,400,50);
 }
 //run the game loop every frame
 function mainloop() {
