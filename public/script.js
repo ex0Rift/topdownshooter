@@ -2,11 +2,18 @@ const gameScreen = document.getElementById('game');
 const ctx = gameScreen.getContext('2d');
 
 let player = {x: 100, y: 100, size: 50, speed: 10, health: 400};
+let activeEnemies = [];
 
-const basicSlime = {size:20, speed:5, health:50};
-const midSlime = {size:40, speed:8, health:100};
+let flagStartWave = false;
+let wave = 0;
 
-const enemiesAvailable = {basicSlime,midSlime};
+const enemiesAvailable = 
+{
+    basicSlime: {size:20, speed:5, health:50},
+    midSlime:   {size:40, speed:8, health:100}
+};
+const enemyList = Object.values(enemiesAvailable);
+
 
 //keypress 
 const keys = {};
@@ -31,6 +38,9 @@ function changePlayerHealth(givenAmount){
 function spawnWave(amount){
     while (amount >= 0)
     {
+        //push a random COPY enemy from enemiesAvailable using enemy list to the active enemy list
+        activeEnemies.push({...enemyList[Math.floor(Math.random() * enemyList.length)]});
+        //itterate for amount of enemies being spawned
         amount --;
     }
 }
@@ -43,16 +53,42 @@ function update(){
 
     if (keys['e'])changePlayerHealth(+5);
     if (keys['q'])changePlayerHealth(-5);
+
+    if (keys['z'])flagStartWave = true;
+
+    
+}
+
+function waveupdate(){
+    //check if new wave is being initiated
+    if (flagStartWave)
+    {
+        //set wavestart flag off and increment wave forward for begining
+        flagStartWave = false;
+        wave ++;
+        
+        console.log(`[GAME] New wave starting. Current wave: ${wave}`);
+    }
 }
 
 function render(){
     //clear the canvas
     ctx.clearRect(0,0, gameScreen.width, gameScreen.height);
 
+    //
     //draw screen items
+    //
+
+    //draw player
     ctx.fillStyle = "#ffffff";
     ctx.fillRect(player.x, player.y, player.size,player.size);
     
+    //draw the enemies
+    for (let i = 0; i < activeEnemies.length; i++)
+    {
+        
+    }
+
     //
     //draw UI
     //
@@ -66,6 +102,7 @@ function render(){
 //run the game loop every frame
 function mainloop() {
     resizeScreen();
+    waveupdate();
     update();
     render();
     requestAnimationFrame(mainloop);
