@@ -9,8 +9,8 @@ let wave = 0;
 
 const enemiesAvailable = 
 {
-    basicSlime: {size:20, speed:5, health:50},
-    midSlime:   {size:40, speed:8, health:100}
+    basicSlime: {size:20, speed:0.001, health:50, x:null, y:null},
+    midSlime:   {size:40, speed:0.01, health:100, x:null, y:null}
 };
 const enemyList = Object.values(enemiesAvailable);
 
@@ -40,6 +40,9 @@ function spawnWave(amount){
     {
         //push a random COPY enemy from enemiesAvailable using enemy list to the active enemy list
         activeEnemies.push({...enemyList[Math.floor(Math.random() * enemyList.length)]});
+        //give the enemey a unique location
+        activeEnemies.at(-1).x = Math.floor(Math.random() * ((gameScreen.width-activeEnemies.at(-1).size) - 0 + 1)) + 0,
+        activeEnemies.at(-1).y = Math.floor(Math.random() * ((gameScreen.height-activeEnemies.at(-1).size) - 0 + 1)) + 0,
         //itterate for amount of enemies being spawned
         amount --;
     }
@@ -56,7 +59,12 @@ function update(){
 
     if (keys['z'])flagStartWave = true;
 
-    
+    //move the enemies
+    for (let i = 0; i < activeEnemies.length; i++)
+    {
+        activeEnemies[i].x += (player.x - activeEnemies[i].x) * activeEnemies[i].speed;
+        activeEnemies[i].y += (player.y - activeEnemies[i].y) * activeEnemies[i].speed;
+    }
 }
 
 function waveupdate(){
@@ -66,6 +74,9 @@ function waveupdate(){
         //set wavestart flag off and increment wave forward for begining
         flagStartWave = false;
         wave ++;
+
+        //spawn the enemies for the wave
+        spawnWave(1);
         
         console.log(`[GAME] New wave starting. Current wave: ${wave}`);
     }
@@ -86,7 +97,9 @@ function render(){
     //draw the enemies
     for (let i = 0; i < activeEnemies.length; i++)
     {
-        
+        //draw the current itterated enemy
+        ctx.fillStyle = "#ff0000";
+        ctx.fillRect(activeEnemies[i].x,activeEnemies[i].y,activeEnemies[i].size,activeEnemies[i].size)
     }
 
     //
