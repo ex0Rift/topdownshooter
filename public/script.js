@@ -3,7 +3,13 @@ const ctx = gameScreen.getContext('2d');
 
 let player = {x: 100, y: 100, size: 50, speed: 10, health: 400};
 let activeEnemies = [];
-let bullets = [];
+let activeBullets = [];
+
+const bulletsAvailable = {
+    BasicBullet:{speed:10, damage:21,x:null,y:null},
+};
+const bulletList = Object.values(bulletsAvailable);
+let currentBulletType = 0;
 
 let flagStartWave = false;
 let wave = 0;
@@ -27,7 +33,7 @@ document.addEventListener('keydown', e => keys[e.key] = true);
 document.addEventListener('keyup', e => keys[e.key] = false);
 
 //mouse checking
-const mousePressed = false;
+let mousePressed = false;
 document.addEventListener('mousedown', e => mousePressed = true);
 document.addEventListener('mouseup', e => mousePressed = false);
 document.addEventListener('mousemove', e => {
@@ -77,7 +83,9 @@ function update(){
     //shoot player gun
     if (mousePressed)
     {
-
+        activeBullets.push({...bulletList[currentBulletType]});
+        activeBullets.at(-1).x = player.x;
+        activeBullets.at(-1).y = player.y;
     }
 
     //move the enemies
@@ -94,6 +102,8 @@ function update(){
             activeEnemies[i].y += (dy / distance) * activeEnemies[i].speed;
         }
     }
+
+    console.log(activeBullets);
 }
 
 function waveupdate(){
@@ -124,9 +134,10 @@ function render(){
     ctx.fillRect(player.x, player.y, player.size,player.size);
     
     //draw the bullets
-    for (let i = 0; i < bullets.length; i++)
+    for (let i = 0; i < activeBullets.length; i++)
     {
-
+        ctx.fillStyle = "#ffb300";
+        ctx.fillRect(activeBullets[i].x,activeBullets[i].y,10,10);
     }
 
     //draw the enemies
@@ -134,7 +145,7 @@ function render(){
     {
         //draw the current itterated enemy
         ctx.fillStyle = "#ff0000";
-        ctx.fillRect(activeEnemies[i].x,activeEnemies[i].y,activeEnemies[i].size,activeEnemies[i].size)
+        ctx.fillRect(activeEnemies[i].x,activeEnemies[i].y,activeEnemies[i].size,activeEnemies[i].size);
     }
 
     //
