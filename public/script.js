@@ -11,11 +11,11 @@ let wave = 0;
 let mouse = {x:null, y:null};
 
 const bulletsAvailable = {
-    Pistol:  {interval:10, damage:19,spread:0,x:null,y:null,dx:null,dy:null,distance:null},
-    SMG:     {interval:2, damage:12,spread:0,x:null,y:null,dx:null,dy:null,distance:null},
-    Rifle:   {interval:20, damage:50,spread:0,x:null,y:null,dx:null,dy:null,distance:null},
-    DeathRay:{interval:1, damage:200,spread:0,x:null,y:null,dx:null,dy:null,distance:null},
-    Shotgun :{interval:10, damage:15,spread:4,x:null,y:null,dx:null,dy:null,distance:null},
+    Pistol:  {interval:10, damage:19,spread:1,x:null,y:null,dx:null,dy:null,distance:null},
+    SMG:     {interval:2, damage:12,spread:1,x:null,y:null,dx:null,dy:null,distance:null},
+    Rifle:   {interval:20, damage:50,spread:1,x:null,y:null,dx:null,dy:null,distance:null},
+    DeathRay:{interval:1, damage:200,spread:1,x:null,y:null,dx:null,dy:null,distance:null},
+    Shotgun :{interval:15, damage:15,spread:5,x:null,y:null,dx:null,dy:null,distance:null},
 };
 const bulletList = Object.values(bulletsAvailable);
 let currentBulletType = 4;
@@ -86,29 +86,41 @@ function update(){
 
     if (keys['z'])flagStartWave = true;
 
-    //shoot player gun
-    if (mousePressed)
+    //controlls how often a bullet is released
+    if (currentBulletInterval == 0)
     {
-        //controlls how often a bullet is released
-        if (currentBulletInterval == 0)
+        //shoot player gun if mouse pressed
+        if (mousePressed)
         {
             //resets bullet interval
             currentBulletInterval = bulletList[currentBulletType].interval;
+            //for adding spread to the bullets
+            for (let i = 0; i < bulletList[currentBulletType].spread; i++)
+            {
+                //adds new bullet to list
+                activeBullets.push({...bulletList[currentBulletType]});
+                //makes first location at the player
+                activeBullets.at(-1).x = player.x;
+                activeBullets.at(-1).y = player.y;
+                //set its dx and dy values
+                const dx = mouse.x - activeBullets.at(-1).x;
+                const dy = mouse.y - activeBullets.at(-1).y;
+                //rotate the dx and dy values for bullet spread
+                let angle = 0;
+                if (i != 0){angle = i * (Math.PI / 36);}
+                const cos = Math.cos(angle);
+                const sin = Math.sin(angle);
+                //dx and dy with applied roation
+                activeBullets.at(-1).dx = dx * cos - dy * sin;
+                activeBullets.at(-1).dy = dx * sin + dy * cos;
 
-            //adds new bullet to list
-            activeBullets.push({...bulletList[currentBulletType]});
-            //makes first location at the player
-            activeBullets.at(-1).x = player.x;
-            activeBullets.at(-1).y = player.y;
-            //set its distance values values
-            activeBullets.at(-1).dx = mouse.x - activeBullets.at(-1).x;
-            activeBullets.at(-1).dy = mouse.y - activeBullets.at(-1).y;
-            //work out distance from mouse at begining for direction
-            activeBullets.at(-1).distance = Math.sqrt(activeBullets.at(-1).dx * activeBullets.at(-1).dx + activeBullets.at(-1).dy * activeBullets.at(-1).dy);
+                //work out distance from mouse at begining for direction
+                activeBullets.at(-1).distance = Math.sqrt(activeBullets.at(-1).dx * activeBullets.at(-1).dx + activeBullets.at(-1).dy * activeBullets.at(-1).dy);
+            }
         }
-        //itterates bullet delay
-        currentBulletInterval --;
     }
+    //itterates bullet delay
+    if (currentBulletInterval != 0)currentBulletInterval --;
 
     //move the enemies
     for (let i = 0; i < activeEnemies.length; i++)
