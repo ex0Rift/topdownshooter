@@ -5,16 +5,22 @@ let player = {x: 100, y: 100, size: 50, speed: 10, health: 400};
 let activeEnemies = [];
 let activeBullets = [];
 
-const bulletsAvailable = {
-    BasicBullet:{speed:10, damage:21,x:null,y:null},
-};
-const bulletList = Object.values(bulletsAvailable);
-let currentBulletType = 0;
-
 let flagStartWave = false;
 let wave = 0;
 
 let mouse = {x:null, y:null};
+
+const bulletsAvailable = {
+    Pistol:  {interval:10, damage:19,spread:0,x:null,y:null,dx:null,dy:null,distance:null},
+    SMG:     {interval:2, damage:12,spread:0,x:null,y:null,dx:null,dy:null,distance:null},
+    Rifle:   {interval:20, damage:50,spread:0,x:null,y:null,dx:null,dy:null,distance:null},
+    DeathRay:{interval:1, damage:200,spread:0,x:null,y:null,dx:null,dy:null,distance:null},
+    Shotgun :{interval:10, damage:15,spread:4,x:null,y:null,dx:null,dy:null,distance:null},
+};
+const bulletList = Object.values(bulletsAvailable);
+let currentBulletType = 4;
+let currentBulletInterval = 0;
+const bulletSpeed = 50;
 
 const enemiesAvailable = 
 {
@@ -83,9 +89,25 @@ function update(){
     //shoot player gun
     if (mousePressed)
     {
-        activeBullets.push({...bulletList[currentBulletType]});
-        activeBullets.at(-1).x = player.x;
-        activeBullets.at(-1).y = player.y;
+        //controlls how often a bullet is released
+        if (currentBulletInterval == 0)
+        {
+            //resets bullet interval
+            currentBulletInterval = bulletList[currentBulletType].interval;
+
+            //adds new bullet to list
+            activeBullets.push({...bulletList[currentBulletType]});
+            //makes first location at the player
+            activeBullets.at(-1).x = player.x;
+            activeBullets.at(-1).y = player.y;
+            //set its distance values values
+            activeBullets.at(-1).dx = mouse.x - activeBullets.at(-1).x;
+            activeBullets.at(-1).dy = mouse.y - activeBullets.at(-1).y;
+            //work out distance from mouse at begining for direction
+            activeBullets.at(-1).distance = Math.sqrt(activeBullets.at(-1).dx * activeBullets.at(-1).dx + activeBullets.at(-1).dy * activeBullets.at(-1).dy);
+        }
+        //itterates bullet delay
+        currentBulletInterval --;
     }
 
     //move the enemies
@@ -102,8 +124,12 @@ function update(){
             activeEnemies[i].y += (dy / distance) * activeEnemies[i].speed;
         }
     }
-
-    console.log(activeBullets);
+    //move the bullets
+    for (let i = 0; i < activeBullets.length; i++)
+    {
+        activeBullets[i].x += (activeBullets[i].dx / activeBullets[i].distance) * bulletSpeed;
+        activeBullets[i].y += (activeBullets[i].dy / activeBullets[i].distance) * bulletSpeed;
+    }
 }
 
 function waveupdate(){
