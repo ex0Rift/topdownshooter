@@ -20,17 +20,17 @@ const bulletsAvailable = {
     Shotgun :{interval:15, damage:15,spread:5,x:null,y:null,dx:null,dy:null,distance:null},
 };
 const bulletList = Object.values(bulletsAvailable);
-let currentBulletType = 1;
+let currentBulletType = 3;
 let currentBulletInterval = 0;
 const bulletSpeed = 50;
 
 const enemiesAvailable = 
 {
-    basicSlime: {size:20, speed:2, health:50, damage:20, x:null, y:null},
-    midSlime:   {size:40, speed:3, health:100, damage:25, x:null, y:null},
-    largeSlime: {size:60, speed:1, health:200, damage:35, x:null, y:null},
-    fastSlime:  {size:30, speed:8, health:40, damage:18, x:null, y:null},
-    tanksSlime: {size:100, speed:0.8, health:300, damage:100, x:null, y:null}
+    basicSlime: {size:50, speed:2, health:50, damage:20, x:null, y:null},
+    midSlime:   {size:70, speed:3, health:100, damage:25, x:null, y:null},
+    largeSlime: {size:90, speed:1, health:200, damage:35, x:null, y:null},
+    fastSlime:  {size:60, speed:8, health:40, damage:18, x:null, y:null},
+    tanksSlime: {size:150, speed:0.8, health:300, damage:100, x:null, y:null}
 };
 const enemyList = Object.values(enemiesAvailable);
 
@@ -73,6 +73,11 @@ function changePlayerHealth(givenAmount){
     if (player.health > 400 || player.health < 0)
     {
         player.health = oldhealth;
+    }
+    //if more damadge is done than health available set it to 0
+    if (player.health+givenAmount < 0)
+    {
+        player.health = 0;
     }
 }
 
@@ -134,9 +139,16 @@ function update(){
     }
     //itterates bullet delay
     if (currentBulletInterval != 0)currentBulletInterval --;
-    //move the enemies and check collision
+    //update each enemy
     for (let i = 0; i < activeEnemies.length; i++)
     {
+        //check for death
+        if (activeEnemies[i].health <= 0)
+        {
+            activeEnemies.splice(i,1);
+            continue;
+        }
+
         //find the difference between the two points
         const dx = player.x - activeEnemies[i].x;
         const dy = player.y - activeEnemies[i].y;
@@ -154,7 +166,8 @@ function update(){
         const collide = checkPointInPerimiter(
             player.x+(player.size/2),
             player.y+(player.size/2),
-            activeEnemies[i].x,activeEnemies[i].y,
+            activeEnemies[i].x,
+            activeEnemies[i].y,
             activeEnemies[i].x+activeEnemies[i].size,
             activeEnemies[i].y+activeEnemies[i].size
         );
@@ -182,6 +195,28 @@ function update(){
         ){  
             //delete bullet if outside the window
             activeBullets.splice(i,1);
+        } //only check collision if bullet has not been deleted
+        else {
+            for (let j = 0; j < activeEnemies.length; j++)
+            {
+                const collide = checkPointInPerimiter(
+                    activeBullets[i].x+5,
+                    activeBullets[i].y+5,
+                    activeEnemies[j].x,
+                    activeEnemies[j].y,
+                    activeEnemies[j].x+activeEnemies[j].size,
+                    activeEnemies[j].y+activeEnemies[j].size
+                )
+                if (collide)
+                {   
+                    //destroy the bullet
+                    activeBullets.splice(i,1);
+                    //apply damadge to the enemy
+                    activeEnemies[j].health -= bulletList[currentBulletType].damage;
+
+                    break;
+                }
+            }
         }
     }
 }
