@@ -1,5 +1,6 @@
 const gameScreen = document.getElementById('game');
 const ctx = gameScreen.getContext('2d');
+const deathScreen = document.getElementById('deathScreen');
 
 let player = {x: 100, y: 100, size: 18, speed: 10, health: 400, damageCoolDown: 120};
 const maxdamageCoolDown = player.damageCoolDown;
@@ -8,6 +9,8 @@ let activeEnemies = [];
 let activeBullets = [];
 
 let flagStartWave = false;
+let flagGameWaiting = false;
+
 let wave = 0;
 
 let mouse = {x:null, y:null};
@@ -20,7 +23,7 @@ const bulletsAvailable = {
     Shotgun :{interval:15, damage:15,spread:5,x:null,y:null,dx:null,dy:null,distance:null},
 };
 const bulletList = Object.values(bulletsAvailable);
-let currentBulletType = 3;
+let currentBulletType = 0;
 let currentBulletInterval = 0;
 const bulletSpeed = 50;
 
@@ -61,10 +64,30 @@ const checkPointInPerimiter = (px, py, x1, y1, x2, y2) => {
     }
 }
 
+//function orignating from index.html to control the deathScreen div from showing
+function replay(){
+    deathScreen.style.display = 'none';
+    flagGameWaiting = false;
+}
+
 function resizeScreen(){
     const rect = gameScreen.getBoundingClientRect();
     gameScreen.width = rect.width;
     gameScreen.height = rect.height;
+}
+
+function playerDeath(){
+    //set the game into waiting for screen input
+    flagGameWaiting = true;
+    //show the death screen
+    deathScreen.style.display = 'flex';
+    //reset player health
+    changePlayerHealth(+400);
+    //reset enemies and bullets on sceen to go away
+    activeEnemies.splice(0,activeEnemies.length);
+    activeBullets.splice(0,activeBullets.length);
+    //set the gun to the default gun
+    currentBulletType = 0;
 }
 
 function changePlayerHealth(givenAmount){
@@ -95,13 +118,19 @@ function spawnWave(amount){
 }
 
 function update(){
+    //check if player health has gone to 0 if so, call playerDeath function to reset the game
+    if (player.health == 0 || flagGameWaiting){
+        if (player.health == 0){playerDeath();}
+
+        
+        //prevent rest of code from running
+        return;
+    }
+
     if (keys['w']) player.y -= player.speed;
     if (keys['a']) player.x -= player.speed;
     if (keys['s']) player.y += player.speed;
     if (keys['d']) player.x += player.speed;
-
-    if (keys['e'])changePlayerHealth(+5);
-    if (keys['q'])changePlayerHealth(-5);
 
     if (keys['z'])flagStartWave = true;
 
@@ -213,7 +242,6 @@ function update(){
                     activeBullets.splice(i,1);
                     //apply damadge to the enemy
                     activeEnemies[j].health -= bulletList[currentBulletType].damage;
-
                     break;
                 }
             }
