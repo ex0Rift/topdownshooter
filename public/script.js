@@ -2,7 +2,7 @@ const gameScreen = document.getElementById('game');
 const ctx = gameScreen.getContext('2d');
 const deathScreen = document.getElementById('deathScreen');
 
-let player = {x: 100, y: 100, size: 18, speed: 10, health: 400, damageCoolDown: 120};
+let player = {x: 100, y: 100, size: 19, speed: 10, health: 400, damageCoolDown: 120};
 const maxdamageCoolDown = player.damageCoolDown;
 
 let activeEnemies = [];
@@ -23,7 +23,7 @@ const bulletsAvailable = {
     Shotgun :{interval:15, damage:15,spread:5,x:null,y:null,dx:null,dy:null,distance:null},
 };
 const bulletList = Object.values(bulletsAvailable);
-let currentBulletType = 0;
+let currentBulletType = 4;
 let currentBulletInterval = 0;
 const bulletSpeed = 50;
 
@@ -74,6 +74,7 @@ function resizeScreen(){
     const rect = gameScreen.getBoundingClientRect();
     gameScreen.width = rect.width;
     gameScreen.height = rect.height;
+    ctx.imageSmoothingEnabled = false;
 }
 
 function playerDeath(){
@@ -274,7 +275,7 @@ function render(){
 
     //draw player
     ctx.fillStyle = "#ffffff";
-    ctx.fillRect(player.x, player.y, player.size,player.size);
+    ctx.drawImage(Iplayer,player.x, player.y, player.size,player.size);
     
     //draw the bullets
     for (let i = 0; i < activeBullets.length; i++)
@@ -286,9 +287,13 @@ function render(){
     //draw the enemies
     for (let i = 0; i < activeEnemies.length; i++)
     {
+        //change image depending on which slime
+        let currentImage = Iplayer;
+        if(activeEnemies[i].size == enemiesAvailable.basicSlime.size){currentImage = IsmallEnemy;}
+        if(activeEnemies[i].size == enemiesAvailable.tanksSlime.size){currentImage = ItankSlime;}
+        if(activeEnemies[i].size == enemiesAvailable.fastSlime.size){currentImage = IfastSlime;}
         //draw the current itterated enemy
-        ctx.fillStyle = "#ff0000";
-        ctx.fillRect(activeEnemies[i].x,activeEnemies[i].y,activeEnemies[i].size,activeEnemies[i].size);
+        ctx.drawImage(currentImage,activeEnemies[i].x,activeEnemies[i].y,activeEnemies[i].size,activeEnemies[i].size);
     }
 
     //
