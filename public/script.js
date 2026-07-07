@@ -5,6 +5,8 @@ const deathScreen = document.getElementById('deathScreen');
 let player = {x: 100, y: 100, size: 19, speed: 10, health: 400, damageCoolDown: 120};
 const maxdamageCoolDown = player.damageCoolDown;
 
+const campFire = {x:gameScreen.width,y:gameScreen.height,size:40};
+
 let activeEnemies = [];
 let activeBullets = [];
 
@@ -74,6 +76,8 @@ function resizeScreen(){
     const rect = gameScreen.getBoundingClientRect();
     gameScreen.width = rect.width;
     gameScreen.height = rect.height;
+    campFire.x = gameScreen.width/2-campFire.size/2;
+    campFire.y = gameScreen.height/2-campFire.size/2;
     ctx.imageSmoothingEnabled = false;
 }
 
@@ -134,6 +138,17 @@ function update(){
     if (keys['d']) player.x += player.speed;
 
     if (keys['z'])flagStartWave = true;
+
+    //start wave if the campfire was pressed
+    if (
+        mousePressed &&
+        mouse.x > campFire.x &&
+        mouse.x < campFire.x+campFire.size &&
+        mouse.y > campFire.y &&
+        mouse.y < campFire.y+campFire.size
+    ){
+        flagStartWave = true;
+    }
 
     //controlls how often a bullet is released
     if (currentBulletInterval == 0)
@@ -295,6 +310,9 @@ function render(){
         //draw the current itterated enemy
         ctx.drawImage(currentImage,activeEnemies[i].x,activeEnemies[i].y,activeEnemies[i].size,activeEnemies[i].size);
     }
+    //draw the wave spawner (campfire)
+    ctx.fillStyle = "#d71149";
+    ctx.fillRect(campFire.x,campFire.y,campFire.size,campFire.size);
 
     //
     //draw UI
