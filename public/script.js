@@ -2,7 +2,7 @@ const gameScreen = document.getElementById('game');
 const ctx = gameScreen.getContext('2d');
 const deathScreen = document.getElementById('deathScreen');
 
-let player = {x: 100, y: 100, size: 19, speed: 10, health: 400, damageCoolDown: 120};
+let player = {x: 100, y: 100, size: 19, speed: 10, health: 400, damageCoolDown: 120, xp: 0, level: 0};
 const maxdamageCoolDown = player.damageCoolDown;
 
 const campFire = {x:gameScreen.width,y:gameScreen.height,size:40};
@@ -14,6 +14,7 @@ let flagStartWave = false;
 let flagGameWaiting = false;
 
 let wave = 0;
+const waveDifficultyMultiplier = 1.5;
 
 let mouse = {x:null, y:null};
 
@@ -25,17 +26,17 @@ const bulletsAvailable = {
     Shotgun :{interval:15, damage:15,spread:5,x:null,y:null,dx:null,dy:null,distance:null},
 };
 const bulletList = Object.values(bulletsAvailable);
-let currentBulletType = 4;
+let currentBulletType = 3;
 let currentBulletInterval = 0;
 const bulletSpeed = 50;
 
 const enemiesAvailable = 
 {
-    basicSlime: {size:50, speed:2, health:50, damage:20, x:null, y:null},
-    midSlime:   {size:70, speed:3, health:100, damage:25, x:null, y:null},
-    largeSlime: {size:90, speed:1, health:200, damage:35, x:null, y:null},
-    fastSlime:  {size:60, speed:8, health:40, damage:18, x:null, y:null},
-    tanksSlime: {size:150, speed:0.8, health:300, damage:100, x:null, y:null}
+    basicSlime: {size:50, speed:2, health:50,xp:30, damage:20, x:null, y:null},
+    midSlime:   {size:70, speed:3, health:100,xp:50, damage:25, x:null, y:null},
+    largeSlime: {size:100, speed:1, health:200,xp:60, damage:35, x:null, y:null},
+    fastSlime:  {size:60, speed:8, health:40,xp:70, damage:18, x:null, y:null},
+    tanksSlime: {size:150, speed:0.8, health:300,xp:110, damage:100, x:null, y:null}
 };
 const enemyList = Object.values(enemiesAvailable);
 
@@ -96,7 +97,7 @@ function playerDeath(){
 }
 
 function changePlayerHealth(givenAmount){
-    let oldhealth = player.health;
+    const oldhealth = player.health;
     player.health +=givenAmount;
     if (player.health > 400 || player.health < 0)
     {
@@ -106,6 +107,20 @@ function changePlayerHealth(givenAmount){
     if (player.health+givenAmount < 0)
     {
         player.health = 0;
+    }
+}
+
+function changePlayerXP(givenAmount){
+    //give the amount of xp
+    player.xp += givenAmount;
+    if (player.xp > 400){
+        //if xp is full, reset xp and add level
+        player.level ++;
+        player.xp = 0;
+    } else if (player.xp < 0){  
+        //if xp goes below 0 remove level and fill xp bar to top 
+        player.level --;
+        player.xp = 400;
     }
 }
 
@@ -139,6 +154,9 @@ function update(){
 
     if (keys['z'])flagStartWave = true;
 
+    if (keys['q'])changePlayerXP(-5);
+    if (keys['e'])changePlayerXP(+5);
+
     //start wave if the campfire was pressed
     if (
         mousePressed &&
@@ -147,7 +165,8 @@ function update(){
         mouse.y > campFire.y &&
         mouse.y < campFire.y+campFire.size
     ){
-        flagStartWave = true;
+        if (activeEnemies.length == 0)
+            flagStartWave = true;
     }
 
     //controlls how often a bullet is released
@@ -190,6 +209,9 @@ function update(){
         //check for death
         if (activeEnemies[i].health <= 0)
         {
+            //give player xp
+            changePlayerXP(activeEnemies[i].xp);
+            //remove the enemey from the array
             activeEnemies.splice(i,1);
             continue;
         }
@@ -274,7 +296,7 @@ function waveupdate(){
         wave ++;
 
         //spawn the enemies for the wave
-        spawnWave(1);
+        spawnWave(wave*waveDifficultyMultiplier);
         
         console.log(`[GAME] New wave starting. Current wave: ${wave}`);
     }
@@ -307,6 +329,8 @@ function render(){
         if(activeEnemies[i].size == enemiesAvailable.basicSlime.size){currentImage = IsmallEnemy;}
         if(activeEnemies[i].size == enemiesAvailable.tanksSlime.size){currentImage = ItankSlime;}
         if(activeEnemies[i].size == enemiesAvailable.fastSlime.size){currentImage = IfastSlime;}
+        if(activeEnemies[i].size == enemiesAvailable.midSlime.size){currentImage = ImidSlime;}
+        if(activeEnemies[i].size == enemiesAvailable.largeSlime.size){currentImage = IbigSlime;}
         //draw the current itterated enemy
         ctx.drawImage(currentImage,activeEnemies[i].x,activeEnemies[i].y,activeEnemies[i].size,activeEnemies[i].size);
     }
@@ -317,12 +341,22 @@ function render(){
     //
     //draw UI
     //
-
+    
     //player health bar
     ctx.fillStyle = "#ffffff";
     ctx.fillRect(30,gameScreen.height-60,410,30);
     ctx.fillStyle = "#ff0000";
     ctx.fillRect(35,gameScreen.height-55,player.health,20);
+
+    //player xp bar
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(gameScreen.width-440,gameScreen.height-60,410,30);
+    ctx.fillStyle = "#218f39";
+    ctx.fillRect(gameScreen.width-435,gameScreen.height-55,player.xp,20);
+    //add text for level
+    ctx.font = '30px Arial';
+    ctx.fillStyle = "#218f39";
+    ctx.fillText(`${player.level}`,gameScreen.width-470,gameScreen.height-35);
 }
 //run the game loop every frame
 function mainloop() {

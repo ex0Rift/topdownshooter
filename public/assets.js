@@ -9,3 +9,9 @@ ItankSlime.src = 'assets/bigSlime.png';
 
 const IfastSlime = new Image();
 IfastSlime.src = 'assets/sppeder.png';
+
+const ImidSlime = new Image();
+ImidSlime.src = 'assets/midslime.png';
+
+const IbigSlime = new Image();
+IbigSlime.src = 'assets/bigishSlime.png';
