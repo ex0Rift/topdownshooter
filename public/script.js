@@ -40,6 +40,13 @@ const enemiesAvailable =
 };
 const enemyList = Object.values(enemiesAvailable);
 
+//create the pattern for the background
+let pattern = null;
+Ibackground.onload = () => {
+    ctx.imageSmoothingEnabled = false;
+    pattern = ctx.createPattern(Ibackground,'repeat');
+    pattern.setTransform(new DOMMatrix().scale(2));
+};
 
 //keypress checking 
 const keys = {};
@@ -303,8 +310,9 @@ function waveupdate(){
 }
 
 function render(){
-    //clear the canvas
-    ctx.clearRect(0,0, gameScreen.width, gameScreen.height);
+    //put the background on the canvas
+    ctx.fillStyle = pattern;
+    ctx.fillRect(0,0,gameScreen.width,gameScreen.height);
 
     //
     //draw screen items
@@ -336,7 +344,7 @@ function render(){
     }
     //draw the wave spawner (campfire)
     ctx.fillStyle = "#d71149";
-    ctx.fillRect(campFire.x,campFire.y,campFire.size,campFire.size);
+    ctx.drawImage(Icampfire,campFire.x,campFire.y,campFire.size,campFire.size);
 
     //
     //draw UI

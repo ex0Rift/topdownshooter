@@ -1,3 +1,6 @@
+const Ibackground = new Image();
+Ibackground.src = 'assets/background.png';
+
 const Iplayer = new Image();
 Iplayer.src ='assets/player.png';
 
@@ -15,3 +18,6 @@ ImidSlime.src = 'assets/midslime.png';
 
 const IbigSlime = new Image();
 IbigSlime.src = 'assets/bigishSlime.png';
+
+const Icampfire = new Image();
+Icampfire.src = 'assets/campfire.png';
