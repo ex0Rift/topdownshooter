@@ -26,7 +26,7 @@ const bulletsAvailable = {
     Shotgun :{interval:15, damage:15,spread:5,x:null,y:null,dx:null,dy:null,distance:null},
 };
 const bulletList = Object.values(bulletsAvailable);
-let currentBulletType = 3;
+let currentBulletType = 1;
 let currentBulletInterval = 0;
 const bulletSpeed = 50;
 
@@ -136,10 +136,28 @@ function spawnWave(amount){
     {
         //push a random COPY enemy from enemiesAvailable using enemy list to the active enemy list
         activeEnemies.push({...enemyList[Math.floor(Math.random() * enemyList.length)]});
-        //give the enemey a unique location
-        activeEnemies.at(-1).x = Math.floor(Math.random() * ((gameScreen.width-activeEnemies.at(-1).size) - 0 + 1)) + 0,
-        activeEnemies.at(-1).y = Math.floor(Math.random() * ((gameScreen.height-activeEnemies.at(-1).size) - 0 + 1)) + 0,
-        //itterate for amount of enemies being spawned
+        const enemy = activeEnemies.at(-1);
+        //give the enemey a unique location along the edge of the screen
+        const side = Math.floor(Math.random() * 4);
+        switch (side){
+            case 0: // top edge
+                enemy.x = Math.floor(Math.random() * gameScreen.width);
+                enemy.y = -enemy.size;
+                break;
+            case 1: //right edge
+                enemy.x = gameScreen.width;
+                enemy.y = Math.floor(Math.random() * gameScreen.height);
+                break;
+            case 2: //bottom edge
+                enemy.x = Math.floor(Math.random() * gameScreen.width);
+                enemy.y = gameScreen.height;
+                break;
+            case 3: // left edge
+                enemy.x = enemy.size;
+                enemy.y = Math.floor(Math.random() * gameScreen.height);
+                break;
+        }
+
         amount --;
     }
 }
@@ -359,11 +377,10 @@ function render(){
     //player xp bar
     ctx.fillStyle = "#ffffff";
     ctx.fillRect(gameScreen.width-440,gameScreen.height-60,410,30);
-    ctx.fillStyle = "#218f39";
+    ctx.fillStyle = "#c3a11a";
     ctx.fillRect(gameScreen.width-435,gameScreen.height-55,player.xp,20);
     //add text for level
     ctx.font = '30px Arial';
-    ctx.fillStyle = "#218f39";
     ctx.fillText(`${player.level}`,gameScreen.width-470,gameScreen.height-35);
 }
 //run the game loop every frame
