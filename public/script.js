@@ -1,11 +1,13 @@
 const gameScreen = document.getElementById('game');
 const ctx = gameScreen.getContext('2d');
 const deathScreen = document.getElementById('deathScreen');
+const shopScreen = document.getElementById('shop');
 
 let player = {x: 100, y: 100, size: 19, speed: 10, health: 400, damageCoolDown: 120, xp: 0, level: 0};
 const maxdamageCoolDown = player.damageCoolDown;
 
 const campFire = {x:gameScreen.width,y:gameScreen.height,size:40};
+const shop = {x:gameScreen.width,y:gameScreen.height,size:80};
 
 let activeEnemies = [];
 let activeBullets = [];
@@ -74,9 +76,10 @@ const checkPointInPerimiter = (px, py, x1, y1, x2, y2) => {
     }
 }
 
-//function orignating from index.html to control the deathScreen div from showing
+//function orignating from index.html to control the extra divs from showing
 function replay(){
     deathScreen.style.display = 'none';
+    shopScreen.style.display = 'none';
     flagGameWaiting = false;
 }
 
@@ -86,6 +89,9 @@ function resizeScreen(){
     gameScreen.height = rect.height;
     campFire.x = gameScreen.width/2-campFire.size/2;
     campFire.y = gameScreen.height/2-campFire.size/2;
+    shop.x = (gameScreen.width/2-shop.size/2)+150;
+    shop.y = (gameScreen.height/2-shop.size/2)+50;
+    
     ctx.imageSmoothingEnabled = false;
 }
 
@@ -101,6 +107,8 @@ function playerDeath(){
     activeBullets.splice(0,activeBullets.length);
     //set the gun to the default gun
     currentBulletType = 0;
+    //set the current wave to the first
+    wave = 0;
 }
 
 function changePlayerHealth(givenAmount){
@@ -164,10 +172,9 @@ function spawnWave(amount){
 
 function update(){
     //check if player health has gone to 0 if so, call playerDeath function to reset the game
+    //also keeps game halted if flagGameWaiting is true
     if (player.health == 0 || flagGameWaiting){
         if (player.health == 0){playerDeath();}
-
-        
         //prevent rest of code from running
         return;
     }
@@ -192,6 +199,18 @@ function update(){
     ){
         if (activeEnemies.length == 0)
             flagStartWave = true;
+    }
+
+    //open shop if shop is pressed
+    if (
+        mousePressed &&
+        mouse.x > shop.x &&
+        mouse.x < shop.x+shop.size &&
+        mouse.y > shop.y &&
+        mouse.y < shop.y+shop.size
+    ){
+        shopScreen.style.display = 'block';
+        flagGameWaiting = true;
     }
 
     //controlls how often a bullet is released
@@ -335,6 +354,9 @@ function render(){
     //
     //draw screen items
     //
+
+    //draw the shop
+    ctx.drawImage(Ishop,shop.x,shop.y,shop.size,shop.size);
 
     //draw player
     ctx.fillStyle = "#ffffff";

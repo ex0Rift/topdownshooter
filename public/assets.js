@@ -21,3 +21,6 @@ IbigSlime.src = 'assets/bigishSlime.png';
 
 const Icampfire = new Image();
 Icampfire.src = 'assets/campfire.png';
+
+const Ishop = new Image();
+Ishop.src = 'assets/shop.png';
