@@ -1,6 +1,7 @@
 const gameScreen = document.getElementById('game');
 const ctx = gameScreen.getContext('2d');
 const deathScreen = document.getElementById('deathScreen');
+const startScreen = document.getElementById('startScreen');
 const shopScreen = document.getElementById('shop');
 
 let player = {x: 100, y: 100, size: 19, speed: 10, health: 400, damageCoolDown: 120, xp: 0, level: 0};
@@ -13,7 +14,7 @@ let activeEnemies = [];
 let activeBullets = [];
 
 let flagStartWave = false;
-let flagGameWaiting = false;
+let flagGameWaiting = true;
 
 let wave = 0;
 const waveDifficultyMultiplier = 1.5;
@@ -23,8 +24,8 @@ let mouse = {x:null, y:null};
 const bulletsAvailable = {
     Pistol:  {interval:10, damage:19,spread:1,cost:0,x:null,y:null,dx:null,dy:null,distance:null},
     SMG:     {interval:2, damage:12,spread:1,cost:3,x:null,y:null,dx:null,dy:null,distance:null},
-    Rifle:   {interval:20, damage:50,spread:1,cost:5,x:null,y:null,dx:null,dy:null,distance:null},
-    Shotgun :{interval:15, damage:15,spread:5,cost:8,x:null,y:null,dx:null,dy:null,distance:null},
+    Rifle:   {interval:20, damage:100,spread:1,cost:8,x:null,y:null,dx:null,dy:null,distance:null},
+    Shotgun :{interval:15, damage:15,spread:5,cost:5,x:null,y:null,dx:null,dy:null,distance:null},
     DeathRay:{interval:1, damage:200,spread:75,cost:999,x:null,y:null,dx:null,dy:null,distance:null},
 };
 
@@ -34,7 +35,7 @@ let gunsUnlocked = [true,false,false,false,false];
 const gunIdentifier = ['pistolStat','smgStat','rifleStat','shotgunStat',null];
 
 const bulletList = Object.values(bulletsAvailable);
-let currentBulletType = 1;
+let currentBulletType = 0;
 let currentBulletInterval = 0;
 const bulletSpeed = 50;
 
@@ -85,8 +86,33 @@ const checkPointInPerimiter = (px, py, x1, y1, x2, y2) => {
 //function orignating from index.html to control the extra divs from showing
 function replay(){
     deathScreen.style.display = 'none';
+    startScreen.style.display = 'none';
     shopScreen.style.display = 'none';
     flagGameWaiting = false;
+}
+
+//function orginating from index.html to change gun when pressed in the shop
+function changeGun(idetifyingIndex){
+    //if the gun is already unlocked
+    if (gunsUnlocked[idetifyingIndex] == true){
+        //reflected equiped gun in the shop
+        document.getElementById(gunIdentifier[currentBulletType]).textContent = 'Owned';
+        document.getElementById(gunIdentifier[idetifyingIndex]).textContent = 'Equiped';
+        //change which bullet type is in use
+        currentBulletType = idetifyingIndex;
+    }
+    //if the gun is not already unlocked check if it can be bought
+    else{
+        //if true the player can afford the cost
+        if (bulletList[idetifyingIndex].cost <= player.level){
+            //decrease player level to apropriate amount
+            player.level -= bulletList[idetifyingIndex].cost;
+            //set gun ownership to true
+            gunsUnlocked[idetifyingIndex] = true;
+            //reflect it in the shop
+            document.getElementById(gunIdentifier[idetifyingIndex]).textContent = 'Owned';
+        }
+    }
 }
 
 function resizeScreen(){

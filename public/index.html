@@ -8,6 +8,23 @@
         <link rel="stylesheet" href="style.css">
     </head>
     <body>
+        <div id="startScreen">
+            <h1>Slime Destroyer!</h1>
+            <div>
+                <h3>How to play</h2>
+                    <p>
+                        WASD: player movment<br>
+                        Left Click: shoot and action<br>
+                        <br>
+                        Click the campfire in the centre to start a new wave!<br>
+                        Collect XP from enemies and gain levels.<br>
+                        Click the marketplace between waves to buy new guns!<br>
+                        Dont let the slimes get you!
+                    </p>
+            </div>
+            <button onclick="replay()">Start</button>
+        </div>
+
         <div id="deathScreen">
             <h1>You are dead</h1>
             <button onclick="replay()">retry</button>
@@ -21,19 +38,19 @@
             </div>
             <hr>
             <div class="shopArea">
-                <div class="item">
+                <div onclick="changeGun(0)" class="item">
                     <h1>Pistol</h1>
                     <h3 id="pistolStat">0xp</h3>
                 </div>
-                <div class="item">
+                <div onclick="changeGun(1)" class="item">
                     <h1>SMG</h1>
                     <h3 id="smgStat">3lvls</h3>
                 </div>
-                <div class="item">
+                <div onclick="changeGun(2)" class="item">
                     <h1>Rifle</h1>
                     <h3 id="rifleStat">5lvls</h3>
                 </div>
-                <div class="item">
+                <div onclick="changeGun(3)" class="item">
                     <h1>Shotgun</h1>
                     <h3 id="shotgunStat">8lvls</h3>
                 </div>
