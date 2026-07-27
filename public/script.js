@@ -21,12 +21,18 @@ const waveDifficultyMultiplier = 1.5;
 let mouse = {x:null, y:null};
 
 const bulletsAvailable = {
-    Pistol:  {interval:10, damage:19,spread:1,x:null,y:null,dx:null,dy:null,distance:null},
-    SMG:     {interval:2, damage:12,spread:1,x:null,y:null,dx:null,dy:null,distance:null},
-    Rifle:   {interval:20, damage:50,spread:1,x:null,y:null,dx:null,dy:null,distance:null},
-    DeathRay:{interval:1, damage:200,spread:75,x:null,y:null,dx:null,dy:null,distance:null},
-    Shotgun :{interval:15, damage:15,spread:5,x:null,y:null,dx:null,dy:null,distance:null},
+    Pistol:  {interval:10, damage:19,spread:1,cost:0,x:null,y:null,dx:null,dy:null,distance:null},
+    SMG:     {interval:2, damage:12,spread:1,cost:3,x:null,y:null,dx:null,dy:null,distance:null},
+    Rifle:   {interval:20, damage:50,spread:1,cost:5,x:null,y:null,dx:null,dy:null,distance:null},
+    Shotgun :{interval:15, damage:15,spread:5,cost:8,x:null,y:null,dx:null,dy:null,distance:null},
+    DeathRay:{interval:1, damage:200,spread:75,cost:999,x:null,y:null,dx:null,dy:null,distance:null},
 };
+
+//marks if the gun is unlocked or not, tracked by being same index as gun
+let gunsUnlocked = [true,false,false,false,false];
+//makes the gun ID avaialbe for easy access, tracked by same index again
+const gunIdentifier = ['pistolStat','smgStat','rifleStat','shotgunStat',null];
+
 const bulletList = Object.values(bulletsAvailable);
 let currentBulletType = 1;
 let currentBulletInterval = 0;
@@ -102,11 +108,16 @@ function playerDeath(){
     deathScreen.style.display = 'flex';
     //reset player health
     changePlayerHealth(+400);
+    //reset player xp
+    player.xp = 0;
+    player.level = 0;
     //reset enemies and bullets on sceen to go away
     activeEnemies.splice(0,activeEnemies.length);
     activeBullets.splice(0,activeBullets.length);
     //set the gun to the default gun
     currentBulletType = 0;
+    //reset owned guns
+    gunsUnlocked = [true,false,false,false,false];
     //set the current wave to the first
     wave = 0;
 }
@@ -184,11 +195,6 @@ function update(){
     if (keys['s']) player.y += player.speed;
     if (keys['d']) player.x += player.speed;
 
-    if (keys['z'])flagStartWave = true;
-
-    if (keys['q'])changePlayerXP(-5);
-    if (keys['e'])changePlayerXP(+5);
-
     //start wave if the campfire was pressed
     if (
         mousePressed &&
@@ -201,14 +207,23 @@ function update(){
             flagStartWave = true;
     }
 
-    //open shop if shop is pressed
+    //open shop if shop is pressed and no enemies on screen
     if (
         mousePressed &&
         mouse.x > shop.x &&
         mouse.x < shop.x+shop.size &&
         mouse.y > shop.y &&
-        mouse.y < shop.y+shop.size
+        mouse.y < shop.y+shop.size &&
+        activeEnemies.length == 0
     ){
+        //get shop ui ready
+        for (let i = 0; i < gunsUnlocked.length; i++){
+            //if gun is unlocked change the attributed text to owned
+            if (gunsUnlocked[i] == true) {document.getElementById(gunIdentifier[i]).textContent = 'Owned';}
+            //if gun is the current gun in use set the attribute text to Equiped
+            if (i == currentBulletType) { document.getElementById(gunIdentifier[i]).textContent = 'Equiped';}
+        }
+        //show shop ui
         shopScreen.style.display = 'block';
         flagGameWaiting = true;
     }
