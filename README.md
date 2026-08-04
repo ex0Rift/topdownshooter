@@ -1,4 +1,4 @@
-# top down shooter
+# Slime Destroyer!
 
 fun little game where you shoot slimes and get more guns! I made it in inspiration from those silly mobile games like brotato. This project is just a bit of fun and the slimes where made as a funny joke with my friends.
 
