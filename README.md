@@ -2,9 +2,13 @@
 
 fun little game where you shoot slimes and get more guns! I made it in inspiration from those silly mobile games like brotato. This project is just a bit of fun and the slimes where made as a funny joke with my friends.
 
+<img width="3936" height="2018" alt="Screenshot 2026-08-04 at 22 08 04" src="https://github.com/user-attachments/assets/12742582-4f35-4004-805a-de7a9c81cf86" />
+
+
 ## Controls
 
 >```W A S D``` - movment
+>
 >```Left Click``` - shoot and interact
 
 Simply start by pressing the central campfire! Then colelct xp from killing them and buy new wepons from the marketplace stand!
